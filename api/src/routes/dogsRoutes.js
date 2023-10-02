@@ -5,13 +5,13 @@ const dogsRouter = Router();
 
 ///aca tendria que poner la ruta y llamar al handler : dogsRouter.get('/', "handler")
 
-dogsRouter.get('/', getDogsHandler);
+dogsRouter.get('/dogs', getDogsHandler);
 
-dogsRouter.get('/:id', getDogsId);
+dogsRouter.get('/dogs/:id', getDogsId);
 
 dogsRouter.get('/name', getDogsName);
 
-//dogsRouter.post('/dogs', postDogs);
+dogsRouter.post('/dogs', postDogs);
 
 //dogsRouter.delete('/:id', deleteDogsId);
 

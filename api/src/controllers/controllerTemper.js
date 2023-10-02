@@ -1,87 +1,37 @@
 const axios = require('axios');
 const { Temperament } = require('../db');
-//cconst { API_KEY } = process.env;
+const {API_KEY} = process.env;
 require('dotenv').config();
 
-const getTemperaments = async (req, res) => {
-      try {
-        // Realizar una solicitud a la API para obtener todos los datos de las razas de perros
-        const response = await axios.get(`https://api.thedogapi.com/v1/breeds?api_key=${API_KEY}`);
-        const dogBreeds = response.data;
-    
-        // Crear un conjunto para almacenar los temperamentos únicos
-        const uniqueTemperaments = new Set();
-    
-        // Recorrer las razas de perros y extraer los temperamentos
-        dogBreeds.forEach((breed) => {
-          if (breed.temperament) {
-            const breedTemperaments = breed.temperament.split(',').map((t) => t.trim());
-            breedTemperaments.forEach((temperament) => {
-              uniqueTemperaments.add(temperament);
-            });
-          }
-        });
-    
-        // Convertir el conjunto de temperamentos a un array
-        const temperamentsArray = Array.from(uniqueTemperaments);
-    
-        // Guardar los temperamentos en la base de datos
-        await Temperament.bulkCreate(
-          temperamentsArray.map((temperament) => ({
-            Nombre: temperament,
-          }))
-        );
-    
-        console.log('Temperamentos guardados con éxito en la base de datos.');
-      } catch (error) {
-        console.error('Error al obtener y guardar los temperamentos:', error);
+const getTemperament = async () => {
+  try {
+    const dogs = (await axios.get(`https://api.thedogapi.com/v1/breeds?api_key=${API_KEY}`)).data
+    // Crear un conjunto para almacenar los temperamentos únicos
+    const dogTemperament = new Set()
+    // Recorrer las razas de perros y extraer los temperamentos
+    dogs.forEach((perro) => {
+      if (perro.temperament) {
+        const dogsTemperaments = perro.temperament.split(',').map((temp) => temp.trim())
+        dogsTemperaments.forEach((temperament) => {
+          dogTemperament.add(temperament)
+        })
       }
-    };
-module.exports = {
-  getTemperaments,
+    })
+    // Convertir el conjunto de temperamentos a un array
+    const allTemperaments = Array.from(dogTemperament)
+    // Guardar los temperamentos en la base de datos
+    await Temperament.bulkCreate(
+      allTemperaments.map((temperament) => ({
+        Nombre: temperament,
+      }))
+    )
+    console.log('Los temperamentos han sido guardados en la base de datos.')
+  } catch (error) {
+    console.error('Error al obtener y guardar los temperamentos:', error);
+    throw new Error(error.message)
+    }
 };
 
-
-
-///////////
-// const axios = require('axios');
-// const { Temperament } = require('../db');
-// const { apikey } = process.env;
-
-// const getTemperaments = async (req, res) => {
-//       try {
-//         // Realizar una solicitud a la API para obtener todos los datos de las razas de perros
-//         const response = await axios.get(`https://api.thedogapi.com/v1/breeds?api_key=${apikey}`);
-//         const dogBreeds = response.data;
-    
-//         // Crear un conjunto para almacenar los temperamentos únicos
-//         const uniqueTemperaments = new Set();
-    
-//         // Recorrer las razas de perros y extraer los temperamentos
-//         dogBreeds.forEach((breed) => {
-//           if (breed.temperament) {
-//             const breedTemperaments = breed.temperament.split(',').map((t) => t.trim());
-//             breedTemperaments.forEach((temperament) => {
-//               uniqueTemperaments.add(temperament);
-//             });
-//           }
-//         });
-    
-//         // Convertir el conjunto de temperamentos a un array
-//         const temperamentsArray = Array.from(uniqueTemperaments);
-    
-//         // Guardar los temperamentos en la base de datos
-//         await Temperament.bulkCreate(
-//           temperamentsArray.map((temperament) => ({
-//             Nombre: temperament,
-//           }))
-//         );
-    
-//         console.log('Temperamentos guardados con éxito en la base de datos.');
-//       } catch (error) {
-//         console.error('Error al obtener y guardar los temperamentos:', error);
-//       }
-//     };
-// module.exports = {
-//   getTemperaments,
-// };
+module.exports = {
+  getTemperament,
+};

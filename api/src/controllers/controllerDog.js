@@ -29,21 +29,26 @@ const getDogs = async () =>{
 ////////funcion que busca perros por id
 const dogId = async (id) =>{
   try{
-    const dogDataBase = await Dog.findByPk(id);
-    if(dogDataBase){
-      return dogDataBase
+    const foundDog = (await axios.get(`https://api.thedogapi.com/v1/breeds/${id}?api_key=${API_KEY}`)).data;
+    if(foundDog){
+      return foundDog
     } else{
-      const foundDog = (await axios.get(`https://api.thedogapi.com/v1/breeds/${id}?api_key=${API_KEY}`)).data;
-      if(foundDog){
-        return foundDog
-      } else{
         throw new Error("No se encontro el perro con el Id: ${id}")
       }
-    }
   }catch (error) {
     throw new Error(error.message)
   }
 };
+// const dogId = async (id,source) => {
+//   try {
+//     const foundDog = source === "api"
+//     ? (await axios.get(`https://api.thedogapi.com/v1/breeds/${id}?api_key=${API_KEY}`)).data
+//     : await Dog.findByPk(id)
+//     return foundDog
+//   } catch (error) {
+//     throw new Error(error.message)
+//   }
+// };
 //////////funcion que trae las razas de perros por nombre
 const dogName = async (name) => {
   try {
@@ -63,155 +68,84 @@ const dogName = async (name) => {
       if (!nameDataBase && !foundName) {
         throw new Error('No se encontró ningún perro con ese nombre.')
       }
-      return dogsName = [...nameDataBase, ...foundName]
+      const dogsName = [...nameDataBase, ...foundName]
+      return dogsName
   } catch (error) {
     throw new Error(error.message)
     }
 };
-// //
-// const createDog = async (req, res) => {
-//   const { Nombre, Altura, Peso, Anios_de_vida, Temperamentos } = req.body;
+//////////funcion para crear un nuevo perro (post)
+const dogCreated = async(dog) => {
+  if (!dog.name || !dog.imagen || !dog.peso || !dog.altura || !dog.lifeSpan) throw new Error('Faltan datos')
+  try {
+    const newDog = await Dog.create(dog)
+    const temperamentsArray = await dog.temperament.split(', ')
+    for (const tempName of temperamentsArray){
+      const temp = await Temperament.findOne({
+        where: {
+          nombre: tempName,
+        },
+      })
+      if (temp) {
+        await newDog.addTemperament(temp);
+      }
+    }
+    const Temperaments = await newDog.getTemperaments()
+    const temperamentName = Temperaments.map(temp => temp.nombre)
+    newDog.temperament = temperamentName.join(', ')
+    await newDog.save()
+    const allDogs = await Dog.findAll()
+    return allDogs
+  } catch (error) {
+    console.error("error al crear",error.message)
+    throw new Error('No se pudo crear el perro')
+  }
+};
 
+// const dogCreated = async (req, res) => {
+//   const { imagen, name, altura, peso, lifeSpan, temperament } = req.body
 //   try {
-//     // Crea la raza de perro en la base de datos
-//     const newDog = await Dog.create({
-//       Nombre,
-//       Altura,
-//       Peso,
-//       Anios_de_vida,
-//     });
-
-//     // Relaciona la raza de perro con los temperamentos asociados
-//     if (Temperamentos && Temperamentos.length > 0) {
-//       const temperaments = await Temperament.findAll({
-//         where: {
-//           Nombre: Temperamentos,
+//     // Verifica que se proporcionen todos los datos necesarios
+//     if (!imagen || !name || !altura || !peso || !lifeSpan || !temperament) throw new Error('Faltan datos')
+//     // Divide los temperamentos proporcionados por coma y elimina espacios en blanco
+//     const temperaments = temperament.split(',').map((temp) => temp.trim())
+//     // Busca los temperamentos en la base de datos
+//     const foundTemperaments = await Temperament.findAll({
+//       where: {
+//         Nombre: {
+//           [Op.in]: temperaments, // Busca temperamentos cuyos nombres estén en la lista proporcionada
 //         },
-//       });
-
-//       await newDog.setTemperaments(temperaments);
-//     }
-
-//     res.status(201).json({ message: 'Raza de perro creada exitosamente' });
+//       },
+//     })
+//     // Crea el nuevo perro en la base de datos
+//     const newDog = await Dog.create({
+//       imagen,
+//       name,
+//       altura,
+//       peso,
+//       lifeSpan,
+//     })
+//     // Relaciona el perro con los temperamentos encontrados
+//     await newDog.setTemperaments(foundTemperaments)
+//     console.log("creado exitosamente")
+//     return newDog
 //   } catch (error) {
-//     console.error('Error al crear la raza de perro:', error);
-//     res.status(500).json({ error: 'Hubo un error al crear la raza de perro.' });
+//     console.error('Error al crear la raza de perro:', error)
+//     throw new Error(error.message)
 //   }
 // };
 
 module.exports = {
-  //createDog,
-  //searchDogsByName,
-  //dogDetail,
   getDogs,
   dogId,
   dogName,
+  dogCreated
 };
 
 /////////////////////
 
-// const addDog = async(dog) =>{
-//   if(!dog.name || !dog.imagen || !dog.peso || !dog.altura || !dog.life_span) throw new Error('Faltan datos')
-//   try {
-//       const newDog = await Dog.create(dog)
 
-//       const temperamentsPk = dog.temperament.split(', ')
-//       for (const pk of temperamentsPk){
-//           const temp = await Temperament.findByPk(pk)
-//           await newDog.addTemperament(temp)
-//       }
 
-//       newDog.temperamentPk = newDog.temperament
-
-//       const temp = await newDog.getTemperaments();
-//       const tempNames = temp.map(temp => temp.nombre);
-//       newDog.temperament = tempNames.join(', ');
-//       await newDog.save()
-
-//       const allDogs = await Dog.findAll()
-
-//       return allDogs
-//   } catch (error) {
-//       throw new Error('No se pudo crear el perro')
-//   }
-// }
-
-// const getDogBreeds = async (req, res) => {
-//     try {
-      
-//       const response = await axios.get(`https://api.thedogapi.com/v1/breeds?api_key=${apikey}`);
-  
-//       const dogData = response.data;
-  
-//       const seenBreeds = {};
-      
-//       // Mapea los datos y extrae solo la información necesaria
-//       const breeds = dogData.reduce((accumulator, dog) => {
-//         const breed = dog.breed_group;
-  
-//         // Verifica si ya hemos visto esta raza antes
-//         if (!seenBreeds[breed]) {
-//           seenBreeds[breed] = true;
-  
-//           // Agrega la raza al arreglo resultante
-//           accumulator.push({
-//             breed: breed,
-//           });
-//         }
-  
-//         return accumulator;
-//       }, []);
-  
-//       // Responde con el arreglo de razas de perro
-//       res.json(breeds);
-  
-//     } catch (error) {
-//       console.error('Error al obtener las razas de perro desde la API:', error);
-//       res.status(500).json({ error: 'Hubo un error al obtener las razas de perro.' });
-//     }
-//   };
-// // //
-// const searchDogsByName = async (name) => {
-//     if(!name) throw new Error('No se ha pasado ningun nombre...')
-
-//     try {
-//         let apiResponse = await axios(`https://api.thedogapi.com/v1/breeds/search?q=${name}&api_key=${apikey}`)
-        
-//         apiResponse = apiResponse.data
-        
-//         const imageRequests = apiResponse.map(async (e) => {
-//             let imageId = e?.reference_image_id;
-//             if(imageId) {
-//                 let res = await axios(`https://api.thedogapi.com/v1/images/${imageId}`);
-//                 return res.data.url;
-//             }else return undefined
-//         });
-//         const imageResponses = await Promise.all(imageRequests);
-
-//         let dbRespose = await Dog.findAll({
-//             where:{
-//                 name:{
-//                     [Op.iLike]: `%${name}%`
-//                 }
-//             }
-//         })
-        
-//         let result = apiResponse.map((dog, index) => ({
-//             ...dog,
-//             imagen: imageResponses[index],
-//             peso: dog.weight?.metric,
-//             altura: dog.height?.metric
-//         }))
-
-//         let allSearchedDogs = [...dbRespose, ...result]
-//         if (allSearchedDogs.length === 0) {
-//             throw new Error('No hay perros con ese nombre')
-//         }
-//         return allSearchedDogs
-//     } catch (error) {
-//         throw new Error(error)
-//     }
-// };
 // const updateDog = async(dog) => {
 //   if(!dog.name || !dog.imagen || !dog.peso || !dog.altura || !dog.life_span) throw new Error('Faltan datos')
 //   try {
@@ -248,20 +182,35 @@ module.exports = {
 //       throw new Error('No se pudo editar el perro')
 //   }
 // }
+
+// const getDetail = async (id) =>{
+//   try {
+//       const response = await axios.get(`https://api.thedogapi.com/v1/breeds?api_key=${apikey}`);
+
+//       const data = response.data;
+
+//       let result = data.filter(dog => dog.id == id)
+//       if(result.length > 0) return result[0]
+
+//       throw new Error('No se encontro ese perro')
+
+//   } catch (error) {
+//       throw new Error(error.message)
+//   }
+// }
 // const deleteDog = async(id) => {
 //   try {
 //       const dog = await Dog.findByPk(id);
 
-//       if(!dog) throw new Error('There is no dog with this id');
+//       if(!dog) throw new Error('No hay perros con este id');
 
 //       await dog.destroy();
 
-//       return 'Dog successfully deleted'
+//       return 'Se ha borrado el perro'
 //   } catch (error) {
-//       throw new Error('There is no dog with this id')
+//       throw new Error('No hay perros con ese id')
 //   }
 // }
-// // //
 // const dbDogs = async() => {
 //   try {
 //       const dbDogs = await Dog.findAll();
@@ -270,14 +219,3 @@ module.exports = {
 //       throw new Error(error)
 //   }
 // }
-
-// module.exports = {
-//   getAllDogs,
-//   dbDogs,
-//   searchDogsByName,
-//   addDog,
-//   getDetail,
-//   updateDog,
-//   getDogBreeds,
-//   deleteDog
-// };

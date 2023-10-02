@@ -1,8 +1,8 @@
-const tempControlller = require("../controllers/controllerTemper");
+const {getTemperament} = require("../controllers/controllerTemper");
 
 const getTemperaments = async(req, res) =>{
     try{
-        const response = await tempControlller.getAllTemperaments();
+        const response = await getTemperament(req, res);
         return res.status(200).json(response)
     } catch(error){
         return res.status(400).json(error.message)

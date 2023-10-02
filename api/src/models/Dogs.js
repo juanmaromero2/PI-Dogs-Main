@@ -5,8 +5,9 @@ module.exports = (sequelize) => {
   // defino el modelo
   sequelize.define('Dog', {
     ID: {
-      type: DataTypes.INTEGER,
-      autoIncrement: true,
+      type: DataTypes.UUID,
+      defaultValue: DataTypes.UUIDV4,
+      //autoIncrement: true,
       primaryKey: true,
     },
     imagen: {
@@ -24,6 +25,14 @@ module.exports = (sequelize) => {
     },
     lifeSpan: {
       type: DataTypes.INTEGER
-    }
+    },
+    temperament: {
+      type: DataTypes.STRING,
+      allowNull: true
+    },
+    // temperamentPk:{
+    //   type: DataTypes.STRING,
+    //   allowNull: true,
+    // }
   });
 };

@@ -4,6 +4,6 @@ const {Router} = require("express");
 
 const temperamentsRouter = Router();
 
-temperamentsRouter.get('/temperaments', getTemperaments);
+temperamentsRouter.get('/', getTemperaments);
 
 module.exports = temperamentsRouter;

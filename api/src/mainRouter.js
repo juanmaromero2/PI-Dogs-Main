@@ -7,7 +7,7 @@ const mainRouter = Router();
 
 // Configurar los routers
 // Ejemplo: router.use('/auth', authRouter);
-mainRouter.use('/dogs', dogsRouter);
+mainRouter.use('/', dogsRouter);
 
 mainRouter.use('/temperaments', temperamentsRouter);
 

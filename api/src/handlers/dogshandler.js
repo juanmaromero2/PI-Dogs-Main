@@ -1,4 +1,4 @@
-const {getDogs, dogId, dogName} = require("../controllers/controllerDog");
+const {getDogs, dogId, dogName, dogCreated} = require("../controllers/controllerDog");
 /// handler que trae todos los perros
 const getDogsHandler = async(req, res) =>{
     try {
@@ -18,6 +18,16 @@ const getDogsId = async(req, res) =>{
         res.status(404).json({error: error.message})
     }
 };
+// const getDogsId = async(req, res) =>{
+//     const {id} = req.params
+//     const source = isNaN(id) ? "bdd" : "api"
+//     try {
+//         const response = await dogId(id, source)
+//         res.status(200).json(response)
+//     } catch (error) {
+//         res.status(404).json({error: error.message})
+//     }
+// };
 ///handler que busca perros por nombre
 const getDogsName = async(req, res) =>{
     const {name} = req.query
@@ -30,10 +40,10 @@ const getDogsName = async(req, res) =>{
 };
 /// handler que crea un perro
 const postDogs =  async(req, res) =>{
-    const perro = req.body
+    const dog = req.body
     try {
-        const dog = await dogsController.addDog(perro)
-        return res.status(201).json(dog)
+        const newDog = await dogCreated(dog)
+        return res.status(201).json(newDog)
     } catch (error) {
         return res.status(400).json(error.message)
     }
