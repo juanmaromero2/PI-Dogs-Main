@@ -8,14 +8,13 @@ export default function Detail() {
   const navigate = useNavigate();
   const [character, setCharacter] = useState({});
 
-
   useEffect(() => {
     axios(`http://localhost:3001/dogs/${id}`).then(
       ({ data }) => {
         if (data.name) {
           setCharacter(data);
         } else {
-          window.alert("No hay personajes con ese ID");
+          alert("No hay personajes con ese ID");
         }
       }
     );
@@ -27,44 +26,37 @@ export default function Detail() {
   };
 
   return (
-    <>
+    <div>
       <div className={style.component}>
-      <h1 className={style.id}>{character.id && character.id}</h1>
-        <img
-          src={character.imagen && character.imagen}
-          alt={character.name}
-        ></img>
-        <h1 className={style.name}>{character.name && character.name}</h1>
-        <p className={style.data}>
-          <span>Height: </span>
-          <span className={style.value}>{character.height && character.height}</span>
-        </p>
-        <p className={style.data}>
-          <span>Weight: </span>
-          <span className={style.value}>{character.weight && character.weight}</span>
-        </p>
-        <p className={style.data}>
-          <span>Temperaments: </span>
-          <span className={style.value}>{character.temperament && character.temperament}</span>
-        </p>
-        {character.breed_for && <p className={style.data}>
-          <span>Raise To: </span>
-          <span className={style.value}>{character.breed_for && character.breed_for}</span>
-        </p>}
-        <p className={style.data}>
-          <span>Years Of Life: </span>
-          <span className={style.value}>{character.life_span}</span>
-        </p>
-        {character.origin && 
-        (<p className={style.data}>
-          <span>Origin: </span>
-          <span className={style.value}>{character.origin && character.origin}</span>
-        </p>)
-        }
-        <button onClick={goBack} className={style.back}>
-          BACK
-        </button>
-      </div>
-    </>
+        <div className={style.image}>
+          <img src={character.imagen} alt={character.name}></img>
+        </div>
+        <div className={style.info}>
+          <h1 className={style.name}>{character.name ? character.name : null}</h1>
+          <p className={style.title}>ID:
+            <span className={style.data}> {character.id}</span>
+          </p>
+          <p className={style.title}>Height:
+            <span className={style.data}> {character.height}</span>
+          </p>
+          <p className={style.title}>Weight:
+            <span className={style.data}> {character.weight}</span>
+          </p>
+          <p className={style.title}>Temperaments:
+            <span className={style.data}> {character.temperament ? character.temperament : null}</span>
+          </p>
+          {character.breed_for ? <p className={style.title}>Trained To:
+            <span className={style.data}> {character.breed_for ? character.breed_for : null}</span>
+          </p> : null}
+          <p className={style.title}>Life Expectancy:
+            <span className={style.data}> {character.life_span}</span>
+          </p>
+          {character.origin ? <p className={style.title}>Origin:
+            <span className={style.data}> {character.origin ? character.origin : null}</span>
+          </p> : null}
+        </div>
+    </div>
+      <button onClick={goBack} className={style.back}> BACK </button>
+    </div>
   );
 }

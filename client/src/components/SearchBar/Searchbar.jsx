@@ -1,8 +1,7 @@
 import { useState } from "react";
 import { useDispatch, useSelector } from 'react-redux'
 import { filterTemperaments, orderDogs, dogByName, dogById, allDogs, allTemperaments, clearDogs } from "../../redux/actions";
-//import style from "./SearchBar.module.css";
-import searchIcon from "../../assets/search.png";
+import style from "./Searchbar.module.css";
 
 export default function SearchBar() {
   const [name, setName] = useState("");
@@ -27,19 +26,20 @@ export default function SearchBar() {
       dispatch(dogById(name))
     }
     dispatch(filterTemperaments('All'))
+    setName("")
 }
 
   return (
-    <div >
+    <div className={style.searchBar}>
       <input
-        
+        className={style.input}
         type="search"
-        placeholder="Ingrese un Nombre"
+        placeholder="Enter a name"
         value={name}
         onChange={HandleChange}
       />
-      <button  onClick={() => onSearch(name)}>
-        {/* <img src={searchIcon} /> */}
+      <button className={style.search} onClick={() => onSearch(name)}>
+        SEARCH
       </button>
     </div>
   );

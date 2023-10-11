@@ -1,22 +1,19 @@
 import { useState, useEffect } from 'react';
-import { Routes, Route, useNavigate } from 'react-router-dom';
-import style from "./App.css"
-// Importaciones de redux
+import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 import { useDispatch, useSelector } from "react-redux";
 import { clearDogs, allDogs } from "./redux/actions";
-// Importaciones de componentes
 import LandingPage from "./components/Landing/LandingPage"
-import Cards from "./components/Cards/Cards";
+import Cards from "./components/Cards/Cardss";
 import Navbar from "./components/Navbar/Navbar";
-import Footer from "./components/Footer/Footer";
 import Detail from './components/Detail/Detail';
-// import Favorites from "./components/Favorites/Favorites";
-
+import Form from './components/Form/Form';
+import style from "./App.css"
 
 export default function App() {
   const dogs = useSelector((state) => state.dogs);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const location = useLocation()
 
   useEffect(()=>{
   dispatch(clearDogs())
@@ -28,32 +25,17 @@ export default function App() {
   }, [])
 
   return (
-      <div className={style.App}>
-        <Routes>
-          <Route path='/' element={<LandingPage/>}/>
-          <Route path="/home" element={
-            <> 
-              <Navbar /> 
-              <Cards dogs={dogs}/> 
-              <Footer />
-            </>}
-          />
-          <Route path="/favorites" element={
-            <> 
-              <Navbar/> 
-              <Footer /> 
-            </>}
-          />
-
-          <Route path="/detail/:id" element={
-            <> 
-              <Navbar/> 
-              <Detail /> 
-              <Footer /> 
-            </>}
-          />
-        </Routes>
-      </div>
+    <div className={style.App}>
+              {
+          location.pathname !== "/"? <Navbar /> : null
+        }
+      <Routes>
+        <Route path='/' element={<LandingPage/>}/>
+        <Route path="/home" element={<Cards dogs={dogs}/>}/>
+        <Route path="/detail/:id" element={<Detail />}/>
+        <Route path='/form' element={<Form/>}/>
+      </Routes>
+    </div>
   )
 }
 

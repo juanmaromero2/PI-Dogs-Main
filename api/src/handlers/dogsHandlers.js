@@ -1,4 +1,4 @@
-const {getDogs, getDetail, addDog, getDogBreeds, searchDogsByName, deleteDog, dbDogs} = require ("../controllers/dogControllers")
+const {getDogs, getDetailDog, getDogsName, creatDog, dogsDataBase, deleteDog, getDogBreeds} = require ("../controllers/dogControllers")
 
 const getDogsHandler = async(req, res) =>{
     try {
@@ -12,7 +12,7 @@ const getDogsHandler = async(req, res) =>{
 const getDogsIdHandler = async(req, res) =>{
     const {id} = req.params
     try {
-        const response = await getDetail(id)
+        const response = await getDetailDog(id)
         return res.status(200).json(response)
     } catch (error) {
         return res.status(404).json({error: error.message})
@@ -22,31 +22,32 @@ const getDogsIdHandler = async(req, res) =>{
 const getDogsNameHandler = async(req, res) =>{
     const {name} = req.query    
     try {
-        const response = await searchDogsByName(name)
+        const response = await getDogsName(name)
         return res.status(200).json(response)
     } catch (error) {
         return res.status(404).json({message: error.message})
     }
 };
 
+const postDogsHandler = async(req, res) =>{
+    const perro = req.body
+    try {
+        const dog = await creatDog(perro)
+        return res.status(201).json(dog)
+    } catch (error) {
+        return res.status(400).json(error.message)
+    }
+};
+
 const getCreatedDogHandler = async(req, res) =>{
     try {
-        const response = await dbDogs()
+        const response = await dogsDataBase()
         return res.status(200).json(response)
     } catch (error) {
         return res.status(400).json({error: error.message})
     }
 };
 
-const postDogsHandler = async(req, res) =>{
-    const perro = req.body
-    try {
-        const dog = await addDog(perro)
-        return res.status(201).json(dog)
-    } catch (error) {
-        return res.status(400).json(error.message)
-    }
-};
 
 const deleteDogsHandler = async(req, res) => {
     const {id} = req.params
